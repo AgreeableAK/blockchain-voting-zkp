@@ -1,4 +1,5 @@
 @semaphore-protocol/=lib/semaphore/packages/contracts/contracts/
-@openzeppelin/=lib/openzeppelin-contracts/
+@openzeppelin/=lib/openzeppelin-contracts/contracts/
 solmate/=lib/solmate/src/
 solady/=lib/solady/src/
+forge-std/=lib/forge-std/src/

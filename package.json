@@ -8,12 +8,18 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "forge build",
+    "test": "forge test",
+    "deploy": "node scripts/deploy.js",
+    "setup-group": "node zk/setup-group.js",
+    "generate-proof": "node zk/generate-proof.js",
+    "generate-wallets": "node scripts/generate-wallets.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
     "@semaphore-protocol/group": "^4.13.1",
     "@semaphore-protocol/identity": "^4.13.1",
     "@semaphore-protocol/proof": "^4.13.1"

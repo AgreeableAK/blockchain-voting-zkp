@@ -1,6 +1,17 @@
 [profile.default]
-src = "src"
+src = "contracts"
 out = "out"
 libs = ["lib"]
+remappings = [
+    "@semaphore-protocol/=lib/semaphore/packages/contracts/contracts/",
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "solmate/=lib/solmate/src/",
+    "solady/=lib/solady/src/"
+]
 
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+[profile.default.fuzz]
+runs = 1000
+
+[profile.default.invariant]
+runs = 1000
+depth = 500

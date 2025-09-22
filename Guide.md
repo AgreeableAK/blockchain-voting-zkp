@@ -149,7 +149,7 @@ depth = 500
 {
   "name": "blockchain-voting-zk",
   "scripts": {
-    "compile": "forge build",
+    "compile": "forge build", 
     "test": "forge test",
     "deploy": "node scripts/deploy.js",
     "setup-group": "node zk/setup-group.js",
