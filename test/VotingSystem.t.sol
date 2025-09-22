@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import {Test, console} from "forge-std/Test.sol";
 import {VotingSystem} from "../src/VotingSystem.sol";
+import { Pausable } from "lib/openzeppelin-contracts/contracts/utils/Pausable.sol";
 
 // Mock Semaphore Verifier for testing
 contract MockSemaphoreVerifier {
@@ -466,7 +467,7 @@ contract VotingSystemTest is Test {
         
         vm.prank(relayer1);
         // The error message in newer OpenZeppelin versions is "EnforcedPause"
-        vm.expectRevert();
+        vm.expectRevert(Pausable.EnforcedPause.selector);
         votingSystem.castVote(0, 12345, a, b, c, publicSignals, merkleTreeDepth);
     }
     
