@@ -576,4 +576,54 @@ contract VotingSystemTest is Test {
         assertEq(finalCounts[1], 1);
         assertEq(finalCounts[2], 0);
     }
+
+// ============ Negative Tests ============
+    function testUnpauseWithoutPause() public {
+        vm.expectRevert();
+        votingSystem.unpauseVoting();
+    }
+
+    function testPauseOnlyOwner() public {
+        vm.prank(unauthorized);
+        vm.expectRevert();
+        votingSystem.pauseVoting();
+    }
+
+    function testUnpauseOnlyOwner() public {
+        votingSystem.pauseVoting();
+        vm.prank(unauthorized);
+        vm.expectRevert();
+        votingSystem.unpauseVoting();
+    }
+
+    function testRemoveRelayerOnlyOwner() public {
+        votingSystem.addRelayer(relayer1);
+        vm.prank(unauthorized);
+        vm.expectRevert();
+        votingSystem.removeRelayer(relayer1);
+    }
+
+    function testVoteWithoutInitialization() public {
+        uint[2] memory a = [uint256(1), uint256(2)];
+        uint[2][2] memory b = [[uint256(3), uint256(4)], [uint256(5), uint256(6)]];
+        uint[2] memory c = [uint256(7), uint256(8)];
+        uint[4] memory publicSignals = [uint256(0), uint256(12345), uint256(999), GROUP_ID];
+        uint256 merkleTreeDepth = 20;
+
+        vm.expectRevert();
+        votingSystem.castVote(0, 12345, a, b, c, publicSignals, merkleTreeDepth);
+    }
+
+    function testVoteCandidateIdMismatchWithSignal() public {
+        votingSystem.initializeVoting(GROUP_ID, startTime, endTime, CANDIDATE_COUNT);
+        votingSystem.addRelayer(relayer1);
+        vm.warp(startTime + 1);
+
+        (uint[2] memory a, uint[2][2] memory b, uint[2] memory c, uint[4] memory publicSignals, uint256 merkleTreeDepth) = createMockProofParams();
+        publicSignals[0] = 0; // signal = 0
+        vm.prank(relayer1);
+        vm.expectRevert();
+        votingSystem.castVote(1, 12345, a, b, c, publicSignals, merkleTreeDepth); // candidateId=1 mismatches signal=0
+    }
+
 }

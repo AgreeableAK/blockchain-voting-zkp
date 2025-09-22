@@ -178,6 +178,9 @@ contract VotingSystem is Ownable, ReentrancyGuard, Pausable {
     {
         // Validate candidate
         if (candidateId >= candidateCount) revert InvalidCandidate();
+        if (candidateId != publicSignals[0]) {
+            revert InvalidCandidate();
+        }
 
         // Check nullifier hasn't been used (prevents double voting)
         if (usedNullifiers[nullifierHash]) revert NullifierAlreadyUsed();
