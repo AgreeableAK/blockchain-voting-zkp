@@ -15,7 +15,8 @@
     "setup-group": "node zk/setup-group.js",
     "generate-proof": "node zk/generate-proof.js",
     "generate-wallets": "node scripts/generate-wallets.js",
-    "download-circuits": "node zk/download-circuits.js"
+    "download-circuits": "node zk/download-circuits.js",
+    "verify-proof": "node zk/verify-proof.js"
   },
   "keywords": [],
   "author": "",
