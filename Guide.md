@@ -190,3 +190,33 @@ forge remappings
 - **Use scripts/ folder**: For JavaScript utilities that interact with your contracts
 
 This hybrid approach gives you the best of both worlds - Foundry's speed for contracts and Semaphore's mature ZK libraries for cryptography!
+
+
+do i need to do this?
+
+3. ZK Proof Flow
+
+ Run npm run setup-group → generates zk/group.json with members + Merkle root.
+
+ Run npm run generate-proof → produces zk/proof.json.
+
+ Later you’ll add npm run verify-proof → to confirm proofs locally.
+
+4. Wallet Generation
+
+ npm run generate-wallets creates scripts/relayer-wallets.json with 10 relayer accounts.
+
+Check with:
+
+cat scripts/relayer-wallets.json
+
+5. Deployment Script
+
+ Configure .env with RPC + private key:
+
+RPC_URL="https://sepolia.infura.io/v3/<your-key>"
+PRIVATE_KEY="0xabc..."
+VERIFIER_ADDRESS="0x..." # SemaphoreVerifier you deployed
+
+
+ Run npm run deploy → writes scripts/deployment.json with contract address.

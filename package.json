@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**",
   "main": "index.js",
+  "type": "module",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -13,7 +14,8 @@
     "deploy": "node scripts/deploy.js",
     "setup-group": "node zk/setup-group.js",
     "generate-proof": "node zk/generate-proof.js",
-    "generate-wallets": "node scripts/generate-wallets.js"
+    "generate-wallets": "node scripts/generate-wallets.js",
+    "download-circuits": "node zk/download-circuits.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,11 @@
     "@openzeppelin/contracts": "^5.4.0",
     "@semaphore-protocol/group": "^4.13.1",
     "@semaphore-protocol/identity": "^4.13.1",
-    "@semaphore-protocol/proof": "^4.13.1"
+    "@semaphore-protocol/proof": "^4.13.1",
+    "@zk-kit/poseidon-cipher": "^0.3.2",
+    "circomlibjs": "^0.1.7"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.2"
   }
 }
