@@ -1,0 +1,33 @@
+node scripts/deploy.js --network sepolia
+🚀 Deploying to Sepolia Testnet...                  > 
+📍 Network: Sepolia Testnet
+👤 Deployer: 0x4e656dA2f7e75d0d0d847b3aAbAD93364F8Eb652
+💰 Balance: 0.083375116141843135 ETH
+🚀 Deploying our own Semaphore Verifier...
+⏳ Deploying verifier (this may take a moment)...
+✅ Semaphore Verifier deployed: 0xB325230f89473f30325
+75Fb22137Eb5F040D5ae9
+🗳️  Deploying VotingSystem contract...
+⏳ Deploying VotingSystem...
+✅ VotingSystem deployed: 0x881f0f817B0bdE9F9495dDbDB
+4E6C06A9D9F5714
+👤 Contract owner: 0x4e656dA2f7e75d0d0d847b3aAbAD93364F8Eb652
+📄 Deployment info saved: F:\CData\chromeFiles\voting\blockchain-voting-zkp\deployments\sepolia.json    
+📄 Contract ABI saved: F:\CData\chromeFiles\voting\blockchain-voting-zkp\deployments\sepolia-abi.json   
+
+🎉 Deployment completed successfully!
+📊 Summary:
+   Network: Sepolia Testnet
+   Semaphore Verifier: 0xB325230f89473f3032575Fb22137Eb5F040D5ae9
+   VotingSystem: 0x881f0f817B0bdE9F9495dDbDB4E6C06A9D9F5714
+   Total Gas Used: 1903089
+
+🔍 Explorer Links:
+   Semaphore Verifier: https://sepolia.etherscan.io/address/0xB325230f89473f3032575Fb22137Eb5F040D5ae9
+   VotingSystem: https://sepolia.etherscan.io/address/0x881f0f817B0bdE9F9495dDbDB4E6C06A9D9F5714
+
+📝 Next Steps:
+   1. Verify contracts on explorer (if available)
+   2. Generate and fund organizational wallets
+   3. Add wallets as relayers to the contract
+   4. Initialize voting parameters

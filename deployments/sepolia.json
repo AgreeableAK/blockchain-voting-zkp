@@ -1,0 +1,18 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "timestamp": "2025-09-23T07:29:41.428Z",
+  "deployer": "0x4e656dA2f7e75d0d0d847b3aAbAD93364F8Eb652",
+  "contracts": {
+    "semaphoreVerifier": "0xB325230f89473f3032575Fb22137Eb5F040D5ae9",
+    "votingSystem": {
+      "address": "0x881f0f817B0bdE9F9495dDbDB4E6C06A9D9F5714",
+      "transactionHash": "0x7eaf9b5f7c35bec6184b59d0a9c9ff9e2603dda38467774f17d51c422c06a5f3"
+    }
+  },
+  "gasUsed": "1903089",
+  "explorerUrls": {
+    "semaphoreVerifier": "https://sepolia.etherscan.io/address/0xB325230f89473f3032575Fb22137Eb5F040D5ae9",
+    "votingSystem": "https://sepolia.etherscan.io/address/0x881f0f817B0bdE9F9495dDbDB4E6C06A9D9F5714"
+  }
+}

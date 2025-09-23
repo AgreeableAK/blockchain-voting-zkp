@@ -25,6 +25,7 @@
   "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^5.4.0",
+    "@semaphore-protocol/contracts": "^4.13.1",
     "@semaphore-protocol/group": "^4.13.1",
     "@semaphore-protocol/identity": "^4.13.1",
     "@semaphore-protocol/proof": "^4.13.1",

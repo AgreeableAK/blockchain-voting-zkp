@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "lib/semaphore/packages/contracts/contracts/interfaces/ISemaphoreVerifier.sol";
+// import "@semaphore-protocol/contracts/interfaces/ISemaphoreVerifier.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";  
 import "lib/openzeppelin-contracts/contracts/utils/Pausable.sol";
