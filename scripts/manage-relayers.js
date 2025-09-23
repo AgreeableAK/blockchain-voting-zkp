@@ -265,7 +265,7 @@ async function main() {
             break;
             
         case 'list':
-            const listAddr = args[1];
+            const listAddr = args[1] || process.env.VOTING_CONTRACT_ADDRESS;
             const listRpc = args[2] || process.env.RPC_URL;
             
             if (!listAddr || !listRpc) {
@@ -277,7 +277,7 @@ async function main() {
             break;
             
         case 'verify':
-            const verifyAddr = args[1];
+            const verifyAddr = args[1]  || process.env.VOTING_CONTRACT_ADDRESS;
             const verifyRpc = args[2] || process.env.RPC_URL;
             
             if (!verifyAddr || !verifyRpc) {
