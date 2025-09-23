@@ -1,4 +1,4 @@
-// zk/finalize-group.js
+// zk/finalize-group.js- run for creating a frozen group_snapshot file
 import fs from "fs";
 import path from "path";
 import { Group } from "@semaphore-protocol/group";

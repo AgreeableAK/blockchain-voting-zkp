@@ -36,7 +36,7 @@ async function main() {
     const voterIdentity = await loadIdentity();
 
     // Load group
-    const groupFile = await prompt("Enter group file path (e.g., zk/group.json): ");
+    const groupFile = await prompt("Enter group file path (e.g., zk/group.json): "); // u can get from zk/group_snapshot as well
     const groupData = JSON.parse(fs.readFileSync(groupFile));
     const members = groupData.members.map(m => BigInt(m));
     const group = new Group(members, groupData.depth);
