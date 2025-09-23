@@ -134,7 +134,7 @@ function loadWallets(password) {
 /**
  * Fund wallets with testnet ETH
  */
-async function fundWallets(wallets, rpcUrl, funderPrivateKey, amountEth = '0.1') {
+async function fundWallets(wallets, rpcUrl, funderPrivateKey, amountEth = '0.01') {
     console.log(`💰 Funding wallets with ${amountEth} ETH each...`);
     
     const provider = new ethers.JsonRpcProvider(rpcUrl);
@@ -278,7 +278,7 @@ async function main() {
         case 'fund':
             const rpcUrl = args[1] || process.env.RPC_URL || 'https://goerli.infura.io/v3/YOUR_KEY';
             const funderKey = args[2] || process.env.FUNDER_PRIVATE_KEY;
-            const amount = args[3] || '0.1';
+            const amount = args[3] || '0.01';
             
             if (!funderKey) {
                 console.error('❌ Funder private key required');
@@ -300,7 +300,7 @@ async function main() {
             
         case 'health':
             const healthRpc = args[1] || process.env.RPC_URL;
-            const healthPassword = 'default-dev-password';
+            const healthPassword = 'your-secure-password';
             await healthCheck(healthRpc, healthPassword);
             break;
             
