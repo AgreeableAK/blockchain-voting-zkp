@@ -1,6 +1,13 @@
 import { ethers } from 'ethers';
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Manage relayer wallets in the VotingSystem contract
@@ -245,7 +252,7 @@ async function main() {
     
     switch (command) {
         case 'add':
-            const contractAddr = args[1];
+            const contractAddr = args[1] || process.env.VOTING_CONTRACT_ADDRESS;
             const rpcUrl = args[2] || process.env.RPC_URL;
             const ownerKey = args[3] || process.env.OWNER_PRIVATE_KEY;
             
@@ -314,6 +321,6 @@ export {
 };
 
 // Run CLI if called directly
-if (require.main === module) {
+if (process.argv[1] === __filename) {
     main().catch(console.error);
 }
