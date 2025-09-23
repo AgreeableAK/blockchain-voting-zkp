@@ -102,13 +102,12 @@ An organization conducting a board election:
 
 ```mermaid
 graph TD
-    A[1. Admin (Owner)] -->|initializeVoting(...)| B[VotingSystem Smart Contract]
-    B -->|Sets groupId, times, candidates| C
-    C[2. Semaphore Group Setup] -->|Off-chain group manager adds eligible voters| D
-    D[3. Voter (Anonymous)] -->|Has private identity, proves group membership, creates ZK proof locally| E
-    E -->|ZK Proof + candidate ID + nullifier| F[4. Relayer (Trusted Org)]
-    F -->|Verifies request, submits castVote() tx| G[5. VotingSystem Smart Contract]
-    G -->|Validates candidate ID, checks nullifier, verifies ZK proof, records vote, emits VoteCast event| H[Event log (VoteCast)]
+    A[1. Admin Owner] -->|"initializeVoting(groupId, times, candidates)"| B[VotingSystem Smart Contract]
+    B -->|"Sets groupId, times, candidates"| C[2. Semaphore Group Setup]
+    C -->|"Off-chain: adds eligible voters"| D[3. Voter Anonymous]
+    D -->|"Generates ZK proof locally"| E[4. Relayer Trusted Org]
+    E -->|"Submits castVote(ZK proof, candidate ID, nullifier)"| B
+    B -->|"Validates ZK proof, records vote"| F[Event log: VoteCast]
 ```
 
 ### 🔍 Explanation of Voting Flow
