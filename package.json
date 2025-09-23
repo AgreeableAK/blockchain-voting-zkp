@@ -16,7 +16,9 @@
     "generate-proof": "node zk/generate-proof.js",
     "generate-wallets": "node scripts/generate-wallets.js",
     "download-circuits": "node zk/download-circuits.js",
-    "verify-proof": "node zk/verify-proof.js"
+    "verify-proof": "node zk/verify-proof.js",
+    "finalize-group": "node zk/finalize-group.js",
+    "create-identity": "node zk/create-identity.js"
   },
   "keywords": [],
   "author": "",
