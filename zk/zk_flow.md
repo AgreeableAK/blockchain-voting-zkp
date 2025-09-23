@@ -1,41 +1,33 @@
-Full ZKP Voting Flow
-1️⃣ Create voter identities
+# Full ZKP Voting Flow
 
-Script: create-identity.js
-Purpose: Generate a voter’s private seed and public commitment.
+## 1️⃣ Create Voter Identities
 
-Steps:
+**Script**: `create-identity.js`  
+**Purpose**: Generate a voter’s private seed and public commitment.
 
-Ask the voter if they want a random seed or enter their own.
+**Steps**:
+- Ask the voter if they want a random seed or to enter their own.
+- Generate a new Identity using the seed.
+- Display:
+  - Seed (must be saved by the voter)
+  - Commitment (used in the voter group)
+- Optionally save to a file:
+  ```json
+  {
+    "seed": "b9ed3c0dd86f7322d80533bb1d6ebe40537d94c83ebff70638b30cb6f0bea84d",
+    "commitment": "8016030189702710763110050363840478720643835053036461389371845080646801880822"
+  }
+  ```
 
-Generate a new Identity using the seed.
+**Key Points**:
+- The seed is the only thing the voter needs to keep.
+- Never store trapdoor/nullifier manually.
 
-Display:
+## 2️⃣ Build and Finalize the Group
 
-Seed (must be saved by the voter)
-
-Commitment (used in the voter group)
-
-Optionally save to a file:
-
-{
-  "seed": "b9ed3c0dd86f7322d80533bb1d6ebe40537d94c83ebff70638b30cb6f0bea84d",
-  "commitment": "8016030189702710763110050363840478720643835053036461389371845080646801880822"
-}
-
-
-Key points:
-
-The seed is the only thing the voter needs to keep.
-
-Never store trapdoor/nullifier manually.
-
-2️⃣ Build and finalize the group
-
-File: group.json
-
+**File**: `group.json`  
 Contains the commitments of all eligible voters:
-
+```json
 {
   "depth": 20,
   "members": [
@@ -45,127 +37,95 @@ Contains the commitments of all eligible voters:
   ],
   "root": "10296963778401874923833083922539164644645097642959841144655251762176912142992"
 }
+```
 
+**Rules**:
+- Freeze the group before voting.
+- No new members are added after voting starts.
+- This ensures Merkle root consistency.
+- If you add a new member:
+  - The Merkle root changes.
+  - All previously generated proofs become invalid.
 
-Rules:
+## 3️⃣ Generate Proof (Vote)
 
-Freeze the group before voting.
+**Script**: `generate-proof.js`  
+**Purpose**: Create a zero-knowledge proof for a voter to vote anonymously.
 
-No new members are added after voting starts.
+**Steps**:
+- Load voter identity from seed.
+- Load `group.json`.
+- Verify the voter’s commitment exists in the group.
+- Ask the voter for candidate ID.
+- Generate the Semaphore proof:
+  - Proves:
+    - You are a member of the group (Merkle proof)
+    - You haven’t voted yet (nullifier)
+    - Your vote is valid (signal)
+- Save proof in `proof.json`:
+  ```json
+  [
+    {
+      "proof": { /* cryptographic proof */ },
+      "publicSignals": {
+        "merkleRoot": "10296963778401874923833083922539164644645097642959841144655251762176912142992",
+        "nullifierHash": "17766884331336309081551377118401823786117525973338267877591115718544843",
+        "signal": "2",
+        "externalNullifier": "1"
+      },
+      "identityCommitment": "8016030189702710763110050363840478720643835053036461389371845080646801880822",
+      "timestamp": "2025-09-23T04:01:19.164Z",
+      "proofId": "proof_1758600079166_gqoqzbwvw"
+    }
+  ]
+  ```
 
-This ensures Merkle root consistency.
+**Key Points**:
+- Only the `publicSignals` and `proof` are saved — the voter’s seed stays private.
+- The proof binds to the Merkle root, so group changes invalidate old proofs.
 
-If you add a new member:
+## 4️⃣ Verify Proofs
 
-The Merkle root changes.
+**Script**: `verify-proof.js`  
+**Purpose**: Check all submitted proofs and tally votes.
 
-All previously generated proofs become invalid.
+**Steps**:
+- Load `group.json` (current Merkle root).
+- Load all proofs from `proof.json`.
+- For each proof:
+  - Check Merkle root matches the group.
+  - Check nullifier hasn’t been used (prevents double votes).
+  - Check signal is valid (candidate ID).
+- Count valid votes per candidate.
 
-3️⃣ Generate proof (vote)
-
-Script: generate-proof.js
-Purpose: Create a zero-knowledge proof for a voter to vote anonymously.
-
-Steps:
-
-Load voter identity from seed.
-
-Load group.json.
-
-Verify the voter’s commitment exists in the group.
-
-Ask the voter for candidate ID.
-
-Generate the Semaphore proof:
-
-Proves:
-- You are a member of the group (Merkle proof)
-- You haven’t voted yet (nullifier)
-- Your vote is valid (signal)
-
-
-Save proof in proof.json:
-
-[
-  {
-    "proof": { /* cryptographic proof */ },
-    "publicSignals": {
-      "merkleRoot": "10296963778401874923833083922539164644645097642959841144655251762176912142992",
-      "nullifierHash": "17766884331336309081551377118401823786117525973338267877591115718544843",
-      "signal": "2",
-      "externalNullifier": "1"
-    },
-    "identityCommitment": "8016030189702710763110050363840478720643835053036461389371845080646801880822",
-    "timestamp": "2025-09-23T04:01:19.164Z",
-    "proofId": "proof_1758600079166_gqoqzbwvw"
-  }
-]
-
-
-Key points:
-
-Only the publicSignals and proof are saved — the voter’s seed stays private.
-
-The proof binds to the Merkle root, so group changes invalidate old proofs.
-
-4️⃣ Verify proofs
-
-Script: verify-proof.js
-Purpose: Check all submitted proofs and tally votes.
-
-Steps:
-
-Load group.json (current Merkle root).
-
-Load all proofs from proof.json.
-
-For each proof:
-
-Check Merkle root matches the group.
-
-Check nullifier hasn’t been used (prevents double votes).
-
-Check signal is valid (candidate ID).
-
-Count valid votes per candidate.
-
-Example output:
-
+**Example Output**:
+```
 ✅ Valid proofs: 5
 ❌ Invalid proofs: 0
 🗳️ Vote tally:
    Candidate 1: 2 votes
    Candidate 2: 3 votes
+```
 
-5️⃣ Best Practices
+## 5️⃣ Best Practices
 
-Freeze the group before voting
+- **Freeze the group before voting**:
+  - Any group change invalidates previously generated proofs.
+- **Save seeds securely**:
+  - Each voter’s seed is their private key.
+  - Losing it means the voter can’t generate proofs.
+- **Use snapshots for voting**:
+  - If you want multiple elections or rounds, take a snapshot of the group at the start.
+  - Only proofs generated with that snapshot are valid.
+- **Never store secrets in proof.json**:
+  - Only the commitment is needed for verification.
+- **External nullifier**:
+  - Use a unique number per election/round.
+  - Prevents voting across multiple elections with the same proof.
 
-Any group change invalidates previously generated proofs.
+## Flow Diagram (Conceptual)
 
-Save seeds securely
-
-Each voter’s seed is their private key.
-
-Losing it means the voter can’t generate proofs.
-
-Use snapshots for voting
-
-If you want multiple elections or rounds, take a snapshot of the group at the start.
-
-Only proofs generated with that snapshot are valid.
-
-Never store secrets in proof.json
-
-Only the commitment is needed for verification.
-
-External nullifier
-
-Use a unique number per election/round.
-
-Prevents voting across multiple elections with the same proof.
-
-Flow Diagram (Conceptual)
+```
 [ Voter Seed ] 
      ↓
 [ Identity Object ] 
@@ -181,14 +141,10 @@ Flow Diagram (Conceptual)
      → Checks: Merkle root, nullifier, vote validity
      ↓
 [ Vote tally ]
+```
 
-
-✅ This flow ensures:
-
-Privacy: Voters remain anonymous.
-
-Integrity: Only eligible voters can vote.
-
-Double-vote prevention: Nullifiers ensure one vote per voter.
-
-Verifiability: Anyone can check the proofs without knowing voter identities.
+## ✅ This Flow Ensures:
+- **Privacy**: Voters remain anonymous.
+- **Integrity**: Only eligible voters can vote.
+- **Double-vote prevention**: Nullifiers ensure one vote per voter.
+- **Verifiability**: Anyone can check the proofs without knowing voter identities.
