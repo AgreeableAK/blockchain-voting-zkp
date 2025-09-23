@@ -19,6 +19,68 @@ A privacy-preserving, gasless voting system built on Ethereum using **Zero-Knowl
 └─────────────────┘    └──────────────────┘    └─────────────────────┘
 ```
 
+## Anonymous Voting Flow (Using Semaphore + Relayers)
+
+```
+                   +---------------------+
+                   |  1. Admin (Owner)   |
+                   +---------------------+
+                            |
+                            | initializeVoting(...)
+                            V
++------------------+   Sets groupId, times, candidates
+|  VotingSystem    |
+|  Smart Contract  | <--------------------------------------+
++------------------+                                        |
+         ^                                                  |
+         |                                                  |
+         |                     +-------------------------+  |
+         |                     | 2. Semaphore Group Setup|  |
+         |                     +-------------------------+  |
+         |                     | Off-chain group manager |  |
+         |                     | adds eligible voters    |  |
+         |                     | (identity commitments)  |  |
+         |                     +-------------------------+  |
+         |                                                  |
+         |                                                  |
+         |                                                  |
+         |                         Voter gets Semaphore ID  |
+         |                    +--------------------------+  |
+         |                    | 3. Voter (Anonymous)     |  |
+         |                    +--------------------------+  |
+         |                    | Has private identity     |  |
+         |                    | Proves group membership  |  |
+         |                    | Creates ZK proof locally |  |
+         |                    +--------------------------+  |
+         |                           |                         |
+         |                           |                         |
+         |                           V                         |
+         |              ZK Proof + candidate ID + nullifier   |
+         |                           |                         |
+         |                           V                         |
+         |                    +--------------------------+     |
+         |                    | 4. Relayer (Trusted Org) |     |
+         |                    +--------------------------+     |
+         |                    | Verifies request         |     |
+         |                    | Submits castVote() tx    |     |
+         |                    +------------+-------------+     |
+         |                                 |                   |
+         |                                 V                   |
+         |          +-------------------------------------+    |
+         |          | 5. VotingSystem Smart Contract      |    |
+         |          +-------------------------------------+    |
+         |          | - Validates candidate ID            |    |
+         |          | - Checks nullifier not used         |    |
+         |          | - Verifies ZK proof via Semaphore   |    |
+         |          | - Records vote                      |    |
+         |          | - Emits VoteCast event              |    |
+         |          +-------------------------------------+    |
+         |                                                      |
+         |<-----------------------------------------------------+
+                           Event log (VoteCast)
+
+```
+
 ## ✨ Key Features
 
 - **🔐 Anonymous Voting** - Zero-Knowledge Proofs ensure voter privacy
