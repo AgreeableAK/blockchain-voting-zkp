@@ -5,10 +5,10 @@ A blockchain-based voting system utilizing Zero Knowledge Proofs (ZKP) to ensure
 ## 🔹 Branch Structure
 - **main**: Stable, demo-ready code.  
 - **dev**: Testing branch where all features are merged before main.  
-- **feat/contracts**: Smart contract development (N + Amit).  
+- **feat/contracts**: Smart contract development (N + A).  
 - **feat/frontend**: Next.js-based user interface (M).  
 - **feat/backend**: Firebase backend integration (K).  
-- **feat/docs**: Documentation and presentation slides (Amit + helpers).
+- **feat/docs**: Documentation and presentation slides (A + helpers).
 
 ## 🔹 Getting Started
 
@@ -53,10 +53,10 @@ git push origin feat/your-feature
 2. Navigate to **Pull Requests** > **New Pull Request**.
 3. Select your branch (`feat/your-feature`) to merge into `dev`.
 4. Add a clear description of your changes and testing details.
-5. Assign a reviewer (e.g., Amit or N).
+5. Assign a reviewer (e.g., Aor N).
 
 ### 7. Final Merge
-- The `dev` branch is merged into `main` by Amit only when stable.
+- The `dev` branch is merged into `main` by A only when stable.
 - The `main` branch must always remain demo-ready.
 
 ## 🔹 Quick Commands Cheat Sheet
