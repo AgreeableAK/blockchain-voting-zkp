@@ -1,0 +1,12 @@
+node_modules/
+*.local
+# Dependencies
+node_modules
+
+# Firebase Emulators & Logs
+*.log
+firebase-debug.log
+
+# Local environment variables (if you ever create them)
+.env
+.env.*
