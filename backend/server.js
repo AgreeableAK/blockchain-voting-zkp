@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const NodeCache = require('node-cache');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -16,7 +17,7 @@ const PORT = process.env.PORT || 3001;
 const config = {
   JWT_SECRET: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-  RPC_URL: process.env.RPC_URL || 'https://sepolia.infura.io/v3/YOUR-PROJECT-ID',
+  RPC_URL: process.env.RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/lK9GMwHLWAjkkaQ8mpQqO',
   CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
   SEMAPHORE_VERIFIER_ADDRESS: process.env.SEMAPHORE_VERIFIER_ADDRESS,
   NETWORK_ID: process.env.NETWORK_ID || 11155111, // Sepolia
@@ -28,23 +29,9 @@ const config = {
 };
 
 // ============ Contract ABI ============
-const VOTING_CONTRACT_ABI = [
-  "function castVote(uint256 candidateId, uint256 nullifierHash, uint[2] calldata a, uint[2][2] calldata b, uint[2] calldata c, uint[4] calldata publicSignals, uint256 merkleTreeDepth) external",
-  "function getVoteCount(uint256 candidateId) external view returns (uint256)",
-  "function getAllVoteCounts() external view returns (uint256[] memory)",
-  "function isVotingActive() external view returns (bool)",
-  "function getVotingInfo() external view returns (uint256 groupId, uint256 startTime, uint256 endTime, uint256 numCandidates, uint256 votes)",
-  "function isNullifierUsed(uint256 nullifierHash) external view returns (bool)",
-  "function getResultPercentages() external view returns (uint256[] memory)",
-  "function getRemainingTime() external view returns (uint256)",
-  "function authorizedRelayers(address) external view returns (bool)",
-  "function getRelayers() external view returns (address[] memory)",
-  "event VoteCast(uint256 indexed candidateId, uint256 indexed nullifierHash, address indexed relayer, uint256 timestamp)"
-];
+const VOTING_CONTRACT_ABI = require('./abis/VotingSystem.json');
+const SEMAPHORE_VERIFIER_ABI = require('./abis/SemaphoreVerifier.json');
 
-const SEMAPHORE_VERIFIER_ABI = [
-  "function verifyProof(uint[2] calldata a, uint[2][2] calldata b, uint[2] calldata c, uint[4] calldata publicSignals, uint256 merkleTreeDepth) external view returns (bool)"
-];
 
 // ============ Blockchain Setup ============
 const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL);
@@ -78,8 +65,13 @@ const votingStats = {
 
 // ============ Middleware ============
 app.use(helmet());
-app.use(cors({
+/*app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
+*/
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500', 'null'], // Allow file:// protocol
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));

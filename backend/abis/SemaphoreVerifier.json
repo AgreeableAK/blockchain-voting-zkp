@@ -1,0 +1,62 @@
+[
+        {
+            "type": "constructor",
+            "inputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "verifyProof",
+            "inputs": [
+                {
+                    "name": "_pA",
+                    "type": "uint256[2]",
+                    "internalType": "uint256[2]"
+                },
+                {
+                    "name": "_pB",
+                    "type": "uint256[2][2]",
+                    "internalType": "uint256[2][2]"
+                },
+                {
+                    "name": "_pC",
+                    "type": "uint256[2]",
+                    "internalType": "uint256[2]"
+                },
+                {
+                    "name": "_pubSignals",
+                    "type": "uint256[4]",
+                    "internalType": "uint256[4]"
+                },
+                {
+                    "name": "merkleTreeDepth",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bool",
+                    "internalType": "bool"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "error",
+            "name": "Semaphore__VKPtBytesMaxDepthInvariantViolated",
+            "inputs": [
+                {
+                    "name": "actual",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "expected",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ]
+        }
+    ]
