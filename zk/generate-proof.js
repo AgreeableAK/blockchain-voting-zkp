@@ -61,16 +61,56 @@ async function main() {
 
     // Generate proof
     const fullProof = await generateProof(voterIdentity, group, EXTERNAL_NULLIFIER, candidateId, groupData.depth);
+    // Helper to safely stringify values
+    const s = v => (v === undefined || v === null) ? "null" : (typeof v === 'bigint' ? v.toString() : (v.toString ? v.toString() : String(v)));
+
+    // Extract points (support multiple shapes)
+    const pts = fullProof.points || fullProof.proof?.points || (Array.isArray(fullProof.proof) ? fullProof.proof : null);
+    if (!pts || !Array.isArray(pts) || pts.length < 8) {
+      throw new Error('Unable to find proof points array (expected 8 elements) on generated proof');
+    }
+
+    // Map points -> Groth16 calldata (stringified)
+    const a = [s(pts[0]), s(pts[1])];
+    const b = [[s(pts[2]), s(pts[3])], [s(pts[4]), s(pts[5])]];
+    const c = [s(pts[6]), s(pts[7])];
+
+    // Build publicSignals in the exact order the backend expects: [signal, nullifierHash, merkleRoot, externalNullifier]
+    const signal = fullProof.scope ? s(fullProof.scope) : (fullProof.publicSignals?.signal ? s(fullProof.publicSignals.signal) : s(candidateId));
+    const nullifierHash = fullProof.nullifier ? s(fullProof.nullifier) : (fullProof.publicSignals?.nullifierHash ? s(fullProof.publicSignals.nullifierHash) : "0");
+    const merkleRoot = fullProof.merkleTreeRoot ? s(fullProof.merkleTreeRoot) : (fullProof.publicSignals?.merkleRoot ? s(fullProof.publicSignals.merkleRoot) : s(getRootFromGroupData(groupData, group) || "0"));
+    const externalNullifier = fullProof.message ? s(fullProof.message) : (fullProof.publicSignals?.externalNullifier ? s(fullProof.publicSignals.externalNullifier) : s(EXTERNAL_NULLIFIER));
+
+    const publicSignalsArray = [
+      s(signal),
+      s(nullifierHash),
+      s(merkleRoot),
+      s(externalNullifier)
+    ];
+
+    // Formatted proof object ready for backend/submission
+    const formattedProof = {
+      a,
+      b,
+      c,
+      publicSignals: publicSignalsArray,
+      merkleTreeDepth: groupData.depth
+    };
 
     const proofData = {
-      proof: fullProof,
+      // keep original full proof for debugging
+      fullProof,
+      // backend-ready Groth16 proof
+      proof: formattedProof,
+      // also keep a readable publicSignals object
       publicSignals: {
-        merkleRoot: fullProof.merkleTreeRoot.toString(),
-        nullifierHash: fullProof.nullifier.toString(),
-        signal: fullProof.scope.toString(),
-        externalNullifier: fullProof.message.toString()
+        signal: String(signal),
+        nullifierHash: String(nullifierHash),
+        merkleRoot: String(merkleRoot),
+        externalNullifier: String(externalNullifier)
       },
       identityCommitment: voterIdentity.commitment.toString(),
+      merkleTreeDepth: groupData.depth,
       timestamp: new Date().toISOString(),
       proofId: `proof_${Date.now()}_${Math.random().toString(36).substr(2,9)}`
     };

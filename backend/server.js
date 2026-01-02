@@ -125,24 +125,15 @@ function selectRandomRelayer() {
   const randomIndex = Math.floor(Math.random() * relayerWallets.length);
   return relayerWallets[randomIndex];
 }
-
-// Verify ZK proof using Semaphore
-async function verifyZKProof(zkProof, merkleTreeDepth) {
+// Verify ZK proof using Semaphore verifier contract
+async function verifyZKProof(zkProof) {
   try {
-    const { a, b, c, publicSignals } = zkProof;
-    
-    // Convert arrays to proper format for contract call
-    const aFormatted = [BigInt(a[0]), BigInt(a[1])];
-    const bFormatted = [[BigInt(b[0][0]), BigInt(b[0][1])], [BigInt(b[1][0]), BigInt(b[1][1])]];
-    const cFormatted = [BigInt(c[0]), BigInt(c[1])];
-    const publicSignalsFormatted = publicSignals.map(signal => BigInt(signal));
-
     const isValid = await semaphoreVerifier.verifyProof(
-      aFormatted,
-      bFormatted,
-      cFormatted,
-      publicSignalsFormatted,
-      merkleTreeDepth
+      zkProof.a.map(BigInt),                // a: [uint256, uint256]
+      zkProof.b.map(row => row.map(BigInt)),// b: [[uint256,uint256],[uint256,uint256]]
+      zkProof.c.map(BigInt),                // c: [uint256,uint256]
+      zkProof.publicSignals.map(BigInt),    // publicSignals: [uint256,uint256,uint256,uint256]
+      BigInt(zkProof.merkleTreeDepth)       // merkleTreeDepth: uint256
     );
 
     return isValid;
@@ -466,12 +457,12 @@ app.post('/api/vote/submit', votingLimiter, authenticateToken, async (req, res) 
 });
 
 // ============ Vote Verification APIs ============
-
-app.post('/api/vote/verify-proof', authenticateToken, async (req, res) => {
+// removed - authenticateToken
+app.post('/api/vote/verify-proof', async (req, res) => {
   try {
-    const { zkProof, merkleTreeDepth = config.MERKLE_TREE_DEPTH } = req.body;
+    const { zkProof } = req.body;
 
-    const proofValid = await verifyZKProof(zkProof, merkleTreeDepth);
+    const proofValid = await verifyZKProof(zkProof);
 
     res.json({
       success: true,
