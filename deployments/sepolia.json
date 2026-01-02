@@ -1,18 +1,64 @@
 {
   "network": "sepolia",
   "chainId": 11155111,
-  "timestamp": "2025-09-23T07:29:41.428Z",
+  "timestamp": "2026-01-02T16:21:15.193Z",
   "deployer": "0x4e656dA2f7e75d0d0d847b3aAbAD93364F8Eb652",
   "contracts": {
-    "semaphoreVerifier": "0xB325230f89473f3032575Fb22137Eb5F040D5ae9",
+    "semaphoreVerifier": "0x2A5bc36Acd726166f9e8a103Eeb287136BDB6583",
     "votingSystem": {
-      "address": "0x881f0f817B0bdE9F9495dDbDB4E6C06A9D9F5714",
-      "transactionHash": "0x7eaf9b5f7c35bec6184b59d0a9c9ff9e2603dda38467774f17d51c422c06a5f3"
+      "address": "0x664eA67e71131939fD2b50ae1d5e27819C65291b",
+      "transactionHash": "0xb78706a32bd44005ee26bd8bc8a67937c3839aa594a86e6e90ab5ed75f735fce"
     }
+  },
+  "relayers": [
+    {
+      "address": "0xfD2addb8CFfA4e5034a404646C07620BC1Fbb1F4",
+      "txHash": "0xc6c71f792b664a74e9d2bf14006482a159ce9613c59e84ca898a1d99b0a1cffc"
+    },
+    {
+      "address": "0xa02EC16Be6589F08C7C9Ef9f95fC295be80a0063",
+      "txHash": "0xb2b4d99b23a9b1ae60289eacaae96a7f8c8d8e0c35ed2f4cf7a8a4355f296008"
+    },
+    {
+      "address": "0x292578F7748B55e53D8E6aF54ADd5830db16AfA8",
+      "txHash": "0xceabb0a21bc31295de7cfec03dfc6463e7259b92fc2f0fbc08a642bda41539c0"
+    },
+    {
+      "address": "0x9f02a6DB2D01d89f74D08b95ad861e8De1a1Fd01",
+      "txHash": "0x3d44e8d79882a416226cb2799ffb9026480658b8ddcc881276b703baf093af34"
+    },
+    {
+      "address": "0xDaEf70f5f4fa3955C1a4787e9b0ce5b2A9673034",
+      "txHash": "0x8d8c5162cd2fdc8cbd687e32d93a431b4aef90a03f8291acc0cf93203d6a2e3c"
+    },
+    {
+      "address": "0x2378C0D150179C04dac364daaA04599b3ac4e1F3",
+      "txHash": "0xe9d2067bd1debaaf5d1fa024bed30645d9c2ee4404cc10399b37d69f6f3b5a11"
+    },
+    {
+      "address": "0x8448Bf9da0A27C8a3e504884be77d2fb009B860D",
+      "txHash": "0x4638dfeacc1dd9df6b002c6f2822980cebad5fd405a1fd07d9e0b0b92639e628"
+    },
+    {
+      "address": "0x1147c426308f678A7D1Cb3299655e2B99010F38F",
+      "txHash": "0x1335b75530ca1c962eb404b96b824a5119d389c3e615cd7c396ec5d29befc158"
+    },
+    {
+      "address": "0x59A7851d5420ac1A1C04FF58AB1A04b3386FEfa4",
+      "txHash": "0x51495982e2aa4b71e3621d71d73e1de1700999f8b158fdce2eef8044bc459a88"
+    },
+    {
+      "address": "0x766f0B818B8D1C6FAed377ACe1DCCF08dD4e12C9",
+      "txHash": "0xc550be756e594f71f941a05f61e08b50a8ec6e15aaeca604f596282f76967e0d"
+    }
+  ],
+  "voting": {
+    "initialized": true,
+    "initTx": "0xa1f0429a2a1c027f451e265f837e73cffb5558d20b69ef2dc702defee70af734"
   },
   "gasUsed": "1903089",
   "explorerUrls": {
-    "semaphoreVerifier": "https://sepolia.etherscan.io/address/0xB325230f89473f3032575Fb22137Eb5F040D5ae9",
-    "votingSystem": "https://sepolia.etherscan.io/address/0x881f0f817B0bdE9F9495dDbDB4E6C06A9D9F5714"
+    "semaphoreVerifier": "https://sepolia.etherscan.io/address/0x2A5bc36Acd726166f9e8a103Eeb287136BDB6583",
+    "votingSystem": "https://sepolia.etherscan.io/address/0x664eA67e71131939fD2b50ae1d5e27819C65291b"
   }
 }

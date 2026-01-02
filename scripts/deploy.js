@@ -122,10 +122,62 @@ async function deployVotingSystem(deployer, semaphoreVerifierAddress, networkNam
     const owner = await votingSystem.owner();
     console.log(`👤 Contract owner: ${owner}`);
     
+    // --- Initialize voting (optional) ---
+    // Use environment override or sensible defaults
+    const now = Math.floor(Date.now() / 1000);
+    const initGroupId = process.env.INITIAL_GROUP_ID ? parseInt(process.env.INITIAL_GROUP_ID) : 12345;
+    const initStart = now + 60; // start in 1 minute
+    const initEnd = now + 10 * 24 * 60 * 60; // end in 10 days
+
+    let votingInitialized = false;
+    let votingInitTxHash = null;
+    try {
+        console.log('⏳ Initializing voting parameters...');
+        const initTx = await votingSystem.initializeVoting(
+            initGroupId,
+            initStart,
+            initEnd,
+            3
+        );
+        const initReceipt = await initTx.wait();
+        votingInitialized = true;
+        votingInitTxHash = initReceipt.transactionHash || initTx.hash;
+        console.log(`✅ Voting initialized: group ${initGroupId}, start ${initStart}, end ${initEnd}`);
+    } catch (err) {
+        console.warn('⚠️  Failed to initialize voting (continuing):', err.message || err);
+    }
+
+    // --- Add relayers from wallets/dev file if present ---
+    const relayersAdded = [];
+    try {
+        const walletsPath = path.join(__dirname, '..', 'wallets', 'wallets-dev-only.json');
+        if (fs.existsSync(walletsPath)) {
+            const walletsList = JSON.parse(fs.readFileSync(walletsPath, 'utf8'));
+            for (const w of walletsList) {
+                try {
+                    console.log(`➕ Adding relayer ${w.address}...`);
+                    const tx = await votingSystem.addRelayer(w.address);
+                    const receipt = await tx.wait();
+                    relayersAdded.push({ address: w.address, txHash: receipt.transactionHash || tx.hash });
+                    console.log(`   ✅ Relayer added: ${w.address}`);
+                } catch (innerErr) {
+                    console.warn(`   ⚠️ Skipped relayer ${w.address}:`, innerErr.message || innerErr);
+                }
+            }
+        } else {
+            console.log('ℹ️  No dev wallets file found, skipping relayer addition');
+        }
+    } catch (err) {
+        console.warn('⚠️  Error while adding relayers (continuing):', err.message || err);
+    }
+
     return {
         contract: votingSystem,
         address: votingAddress,
-        abi: votingArtifacts.abi
+        abi: votingArtifacts.abi,
+        votingInitialized,
+        votingInitTxHash,
+        relayersAdded
     };
 }
 
@@ -151,6 +203,11 @@ function saveDeploymentInfo(networkName, deploymentData) {
                 address: deploymentData.votingSystem.address,
                 transactionHash: deploymentData.votingSystem.txHash
             }
+        },
+        relayers: deploymentData.relayers || [],
+        voting: {
+            initialized: deploymentData.votingInitialized || false,
+            initTx: deploymentData.votingInitTxHash || null
         },
         gasUsed: deploymentData.gasUsed,
         explorerUrls: {
@@ -220,6 +277,9 @@ async function deployToNetwork(networkName) {
                 abi: votingSystemDeployment.abi,
                 txHash: votingSystemDeployment.contract.deploymentTransaction().hash
             },
+            relayers: votingSystemDeployment.relayersAdded || [],
+            votingInitialized: votingSystemDeployment.votingInitialized || false,
+            votingInitTxHash: votingSystemDeployment.votingInitTxHash || null,
             gasUsed: totalGasUsed.toString(),
             explorerUrl: NETWORKS[networkName].explorerUrl
         };
