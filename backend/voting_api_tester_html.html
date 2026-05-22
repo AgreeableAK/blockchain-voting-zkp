@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting System API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-active {
+            background-color: #2563eb;
+            color: white;
+        }
+        .tab-inactive {
+            color: #374151;
+        }
+        .tab-inactive:hover {
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen p-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h1 class="text-3xl font-bold mb-2 text-gray-800">🗳️ Voting System API Tester</h1>
+                <p class="text-gray-600 mb-4">Test all backend APIs from your deployed server</p>
+                
+                <div class="flex gap-4 mb-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium mb-1">Base URL</label>
+                        <input type="text" id="baseUrl" value="http://localhost:3001" 
+                               class="w-full px-3 py-2 border rounded" placeholder="http://localhost:3001">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium mb-1">Auth Token</label>
+                        <input type="text" id="authToken" 
+                               class="w-full px-3 py-2 border rounded" placeholder="JWT token from login">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-lg p-4 sticky top-6">
+                        <h2 class="text-xl font-semibold mb-4">API Categories</h2>
+                        <div class="space-y-2" id="tabs">
+                            <button onclick="switchTab('auth')" class="tab w-full text-left px-4 py-2 rounded tab-active" data-tab="auth">
+                                🔒 Authentication
+                            </button>
+                            <button onclick="switchTab('vote')" class="tab w-full text-left px-4 py-2 rounded tab-inactive" data-tab="vote">
+                                🗳️ Voting
+                            </button>
+                            <button onclick="switchTab('config')" class="tab w-full text-left px-4 py-2 rounded tab-inactive" data-tab="config">
+                                ⚙️ Configuration
+                            </button>
+                            <button onclick="switchTab('candidates')" class="tab w-full text-left px-4 py-2 rounded tab-inactive" data-tab="candidates">
+                                👥 Candidates
+                            </button>
+                            <button onclick="switchTab('blockchain')" class="tab w-full text-left px-4 py-2 rounded tab-inactive" data-tab="blockchain">
+                                🔗 Blockchain
+                            </button>
+                            <button onclick="switchTab('identity')" class="tab w-full text-left px-4 py-2 rounded tab-inactive" data-tab="identity">
+                                🆔 Identity
+                            </button>
+                            <button onclick="switchTab('monitoring')" class="tab w-full text-left px-4 py-2 rounded tab-inactive" data-tab="monitoring">
+                                📊 Monitoring
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6" id="content">
+                        <!-- Content will be injected here -->
+                    </div>
+
+                    <!-- Loading -->
+                    <div id="loading" class="hidden bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <span>⏳ Loading...</span>
+                    </div>
+
+                    <!-- Response -->
+                    <div id="response" class="hidden bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold" id="responseTitle"></h3>
+                            <span class="text-sm text-gray-500" id="responseTime"></span>
+                        </div>
+                        <div class="mb-4" id="responseStatus"></div>
+                        <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto text-sm" id="responseData"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'auth';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.dataset.tab === tab) {
+                    t.classList.remove('tab-inactive');
+                    t.classList.add('tab-active');
+                } else {
+                    t.classList.remove('tab-active');
+                    t.classList.add('tab-inactive');
+                }
+            });
+            renderContent();
+        }
+
+        function renderContent() {
+            const content = document.getElementById('content');
+            const sections = {
+                auth: `
+                    <h3 class="text-lg font-semibold mb-4">🔒 Authentication APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">POST /api/auth/login</h4>
+                        <input type="email" id="login_email" value="test@example.com" placeholder="Email" class="w-full px-3 py-2 border rounded mb-2">
+                        <input type="text" id="login_token" placeholder="Google Token (optional)" class="w-full px-3 py-2 border rounded mb-2">
+                        <button onclick="apiLogin()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Login
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/auth/session</h4>
+                        <button onclick="apiRequest('GET', '/api/auth/session', null, true)" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Check Session
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">POST /api/auth/logout</h4>
+                        <button onclick="apiRequest('POST', '/api/auth/logout', null, true)" class="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                            📤 Logout
+                        </button>
+                    </div>
+                `,
+                vote: `
+                    <h3 class="text-lg font-semibold mb-4">🗳️ Vote Submission APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">POST /api/vote/submit</h4>
+                        <input type="number" id="vote_candidate" value="0" placeholder="Candidate ID" class="w-full px-3 py-2 border rounded mb-2">
+                        <input type="text" id="vote_nullifier" value="0x${'1'.repeat(64)}" placeholder="Nullifier Hash" class="w-full px-3 py-2 border rounded mb-2">
+                        <textarea id="vote_proof" placeholder="ZK Proof (JSON)" class="w-full px-3 py-2 border rounded font-mono text-sm mb-2" rows="8">${JSON.stringify({
+                            a: ["0x1", "0x2"],
+                            b: [["0x3", "0x4"], ["0x5", "0x6"]],
+                            c: ["0x7", "0x8"],
+                            publicSignals: ["0", "0x" + "1".repeat(64), "0x" + "2".repeat(64), "12345"]
+                        }, null, 2)}</textarea>
+                        <button onclick="apiSubmitVote()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Submit Vote
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">POST /api/vote/verify-proof</h4>
+                        <button onclick="apiVerifyProof()" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Verify Proof
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">GET /api/vote/nullifier-status/:nullifierHash</h4>
+                        <button onclick="apiCheckNullifier()" class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                            📤 Check Nullifier Status
+                        </button>
+                    </div>
+                `,
+                config: `
+                    <h3 class="text-lg font-semibold mb-4">⚙️ Voting Configuration APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/voting/config</h4>
+                        <button onclick="apiRequest('GET', '/api/voting/config')" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Get Config
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/voting/status</h4>
+                        <button onclick="apiRequest('GET', '/api/voting/status')" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Get Status
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/voting/results</h4>
+                        <button onclick="apiRequest('GET', '/api/voting/results')" class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                            📤 Get Results
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">GET /api/voting/remaining-time</h4>
+                        <button onclick="apiRequest('GET', '/api/voting/remaining-time')" class="w-full bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+                            📤 Get Remaining Time
+                        </button>
+                    </div>
+                `,
+                candidates: `
+                    <h3 class="text-lg font-semibold mb-4">👥 Candidate Management APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/candidates</h4>
+                        <button onclick="apiRequest('GET', '/api/candidates')" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Get All Candidates
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">POST /api/admin/candidates</h4>
+                        <input type="text" id="cand_name" placeholder="Name" class="w-full px-3 py-2 border rounded mb-2">
+                        <input type="text" id="cand_party" placeholder="Party" class="w-full px-3 py-2 border rounded mb-2">
+                        <input type="text" id="cand_image" placeholder="Image URL" class="w-full px-3 py-2 border rounded mb-2">
+                        <textarea id="cand_bio" placeholder="Biography" class="w-full px-3 py-2 border rounded mb-2" rows="2"></textarea>
+                        <textarea id="cand_manifesto" placeholder="Manifesto" class="w-full px-3 py-2 border rounded mb-2" rows="2"></textarea>
+                        <button onclick="apiAddCandidate()" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Add Candidate
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">GET /api/candidates/:candidateId/votes</h4>
+                        <input type="number" id="cand_id" value="0" placeholder="Candidate ID" class="w-full px-3 py-2 border rounded mb-2">
+                        <button onclick="apiCandidateVotes()" class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                            📤 Get Candidate Votes
+                        </button>
+                    </div>
+                `,
+                blockchain: `
+                    <h3 class="text-lg font-semibold mb-4">🔗 Blockchain APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/blockchain/relayer-status</h4>
+                        <button onclick="apiRequest('GET', '/api/blockchain/relayer-status')" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Get Relayer Status
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">GET /api/blockchain/transaction/:txHash</h4>
+                        <input type="text" id="tx_hash" placeholder="Transaction Hash" class="w-full px-3 py-2 border rounded mb-2">
+                        <button onclick="apiTransaction()" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Get Transaction
+                        </button>
+                    </div>
+                `,
+                identity: `
+                    <h3 class="text-lg font-semibold mb-4">🆔 Identity & Merkle Tree APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">POST /api/voter/generate-identity</h4>
+                        <input type="text" id="identity_commitment" value="0x${'3'.repeat(64)}" placeholder="Identity Commitment" class="w-full px-3 py-2 border rounded mb-2">
+                        <button onclick="apiGenerateIdentity()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Generate Identity
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">GET /api/voter/merkle-proof/:identityCommitment</h4>
+                        <button onclick="apiMerkleProof()" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Get Merkle Proof
+                        </button>
+                    </div>
+                `,
+                monitoring: `
+                    <h3 class="text-lg font-semibold mb-4">📊 Monitoring APIs</h3>
+                    
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/health</h4>
+                        <button onclick="apiRequest('GET', '/api/health')" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            📤 Health Check
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-4">
+                        <h4 class="font-medium mb-3">GET /api/stats/voting-activity</h4>
+                        <button onclick="apiRequest('GET', '/api/stats/voting-activity')" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            📤 Get Voting Activity
+                        </button>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <h4 class="font-medium mb-3">GET /api/errors/:errorId</h4>
+                        <input type="text" id="error_id" placeholder="Error ID" class="w-full px-3 py-2 border rounded mb-2">
+                        <button onclick="apiErrorDetails()" class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                            📤 Get Error Details
+                        </button>
+                    </div>
+                `
+            };
+            content.innerHTML = sections[currentTab];
+        }
+
+        async function apiRequest(method, endpoint, body = null, requiresAuth = false) {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const authToken = document.getElementById('authToken').value;
+            
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('response').classList.add('hidden');
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (requiresAuth && authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const config = { method, headers };
+                if (body && method !== 'GET') {
+                    config.body = JSON.stringify(body);
+                }
+
+                const res = await fetch(`${baseUrl}${endpoint}`, config);
+                const data = await res.json();
+
+                showResponse(res.status, res.statusText, data);
+            } catch (error) {
+                showResponse('ERROR', 'Network Error', { error: error.message });
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function showResponse(status, statusText, data) {
+            const responseDiv = document.getElementById('response');
+            const titleDiv = document.getElementById('responseTitle');
+            const timeDiv = document.getElementById('responseTime');
+            const statusDiv = document.getElementById('responseStatus');
+            const dataDiv = document.getElementById('responseData');
+
+            responseDiv.classList.remove('hidden');
+            
+            if (status === 'ERROR') {
+                titleDiv.innerHTML = '❌ Error Response';
+                statusDiv.innerHTML = '';
+            } else if (status < 400) {
+                titleDiv.innerHTML = '✅ Success Response';
+                statusDiv.innerHTML = `<span class="inline-block px-3 py-1 rounded text-white bg-green-600">${status} ${statusText}</span>`;
+            } else {
+                titleDiv.innerHTML = '⚠️ Error Response';
+                statusDiv.innerHTML = `<span class="inline-block px-3 py-1 rounded text-white bg-red-600">${status} ${statusText}</span>`;
+            }
+
+            timeDiv.textContent = new Date().toISOString();
+            dataDiv.textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Specific API functions
+        function apiLogin() {
+            const email = document.getElementById('login_email').value;
+            const googleToken = document.getElementById('login_token').value;
+            apiRequest('POST', '/api/auth/login', { email, googleToken: googleToken || undefined });
+        }
+
+        function apiSubmitVote() {
+            const candidateId = parseInt(document.getElementById('vote_candidate').value);
+            const nullifierHash = document.getElementById('vote_nullifier').value;
+            const zkProof = document.getElementById('vote_proof').value;
+            
+            try {
+                const proof = JSON.parse(zkProof);
+                apiRequest('POST', '/api/vote/submit', {
+                    candidateId,
+                    nullifierHash,
+                    zkProof: proof,
+                    merkleTreeDepth: 20
+                }, true);
+            } catch (e) {
+                alert('Invalid JSON in ZK Proof: ' + e.message);
+            }
+        }
+
+        function apiVerifyProof() {
+            const zkProof = document.getElementById('vote_proof').value;
+            try {
+                const proof = JSON.parse(zkProof);
+                apiRequest('POST', '/api/vote/verify-proof', { zkProof: proof, merkleTreeDepth: 20 }, true);
+            } catch (e) {
+                alert('Invalid JSON in ZK Proof: ' + e.message);
+            }
+        }
+
+        function apiCheckNullifier() {
+            const nullifierHash = document.getElementById('vote_nullifier').value;
+            apiRequest('GET', `/api/vote/nullifier-status/${nullifierHash}`);
+        }
+
+        function apiAddCandidate() {
+            const body = {
+                name: document.getElementById('cand_name').value,
+                party: document.getElementById('cand_party').value,
+                imageUrl: document.getElementById('cand_image').value,
+                biography: document.getElementById('cand_bio').value,
+                manifesto: document.getElementById('cand_manifesto').value
+            };
+            apiRequest('POST', '/api/admin/candidates', body, true);
+        }
+
+        function apiCandidateVotes() {
+            const candidateId = document.getElementById('cand_id').value;
+            apiRequest('GET', `/api/candidates/${candidateId}/votes`);
+        }
+
+        function apiTransaction() {
+            const txHash = document.getElementById('tx_hash').value;
+            apiRequest('GET', `/api/blockchain/transaction/${txHash}`);
+        }
+
+        function apiGenerateIdentity() {
+            const identityCommitment = document.getElementById('identity_commitment').value;
+            apiRequest('POST', '/api/voter/generate-identity', { identityCommitment }, true);
+        }
+
+        function apiMerkleProof() {
+            const identityCommitment = document.getElementById('identity_commitment').value;
+            apiRequest('GET', `/api/voter/merkle-proof/${identityCommitment}`);
+        }
+
+        function apiErrorDetails() {
+            const errorId = document.getElementById('error_id').value;
+            apiRequest('GET', `/api/errors/${errorId}`);
+        }
+
+        // Initialize
+        renderContent();
+    </script>
+</body>
+</html>
